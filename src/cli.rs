@@ -76,5 +76,6 @@ pub struct Cli {
 pub enum Shell {
     Bash,
     Fish,
+    Nushell,
     Zsh,
 }

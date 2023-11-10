@@ -100,6 +100,7 @@ mod add_script_line {
                 let path_option = if is_path { " --path" } else { "" };
                 format!("set -gx{} {} {}", path_option, name, value)
             }
+            Nushell => format!("$env:{} = \"{}\"", name, value),
         }
     }
 
@@ -110,6 +111,7 @@ mod add_script_line {
         match shell {
             Bash | Zsh => format!("unset {}", name),
             Fish => format!("set -ge {}", name),
+            Nushell => format!("hide-env {}", name),
         }
     }
 }
@@ -141,14 +143,17 @@ fn expand_value(value: &str, shell: &Shell) -> String {
             (Literal, _) => single_quote(value, shell),
 
             (ShellVariable, Bash | Zsh | Fish) => format!(r#""${}""#, value),
+            (ShellVariable, Nushell) => format!(r#"$"($env.{})""#, value),
 
             (ShellCommand, Bash | Zsh) => format!("$(eval {})", single_quote(value, shell)),
             (ShellCommand, Fish) => format!("(eval {})", single_quote(value, shell)),
+            (ShellCommand, Nushell) => format!("(eval {})", single_quote(value, shell)),
 
             (Home, Bash | Zsh) => {
                 format!("$(eval echo \"~{}\")", value)
             }
             (Home, Fish) => format!("(eval echo \"~{}\")", value),
+            (Home, Nushell) => format!("(eval echo \"~{}\")", value),
         }
     };
 
@@ -182,6 +187,7 @@ fn single_quote(string: &str, shell: &Shell) -> String {
             .collect::<Vec<String>>()
             .join(r#""'""#),
         Fish => format!("'{}'", string.replace('\\', "\\\\").replace('\'', "\\'")),
+        Nushell => format!("'{}'", string),
     }
 }
 
