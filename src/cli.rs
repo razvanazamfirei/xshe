@@ -13,7 +13,8 @@
 
 //! Defines the CLI interface for Xshe.
 
-use clap::{ArgGroup, Parser, ValueEnum, ValueHint};
+use crate::Shells;
+use clap::{ArgGroup, Parser, ValueHint};
 use clap_verbosity_flag::{Verbosity, WarnLevel};
 use std::path::PathBuf;
 
@@ -29,7 +30,7 @@ use std::path::PathBuf;
 /// or in the `docs/` source directory.
 ///
 /// Source Repository: https://github.com/superatomic/xshe
-pub struct Cli {
+pub(crate) struct Cli {
     /// The shell to generate a script for
     ///
     /// Outputs a runnable shell script for the specified shell.
@@ -37,7 +38,7 @@ pub struct Cli {
     /// You can directly source these files in your shell.
     /// See <https://xshe.superatomic.dev/#/cli> for a detailed explanation.
     #[arg(value_enum, index = 1)]
-    pub shell: Shell,
+    pub shell: Shells,
 
     #[arg(short, long, value_name = "FILE", value_hint = ValueHint::FilePath)]
     #[arg(env = "XSHE_CONFIG", group = "mode")]
@@ -70,11 +71,4 @@ pub struct Cli {
 
     #[clap(flatten)]
     pub verbose: Verbosity<WarnLevel>,
-}
-
-#[derive(ValueEnum, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Shell {
-    Bash,
-    Fish,
-    Zsh,
 }

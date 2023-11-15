@@ -28,6 +28,8 @@ log = "0.4.20"
 env_logger = "0.10.1"
 colored = "2.0.4"
 dirs = "5.0.1"
+indoc = { version = "2.0.4", features = [] }
+
 
 [dev-dependencies]
 indoc = "2.0.4"

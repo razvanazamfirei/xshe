@@ -26,9 +26,10 @@
 
 #![forbid(unsafe_code)]
 
-mod cli;
-mod convert;
-mod structure;
+pub mod cli;
+pub mod convert;
+pub mod shells;
+pub mod structure;
 
 #[macro_use]
 extern crate log;
@@ -39,8 +40,9 @@ use indexmap::IndexMap;
 use std::io::{stdin, ErrorKind, Read};
 use std::{env, fs, path::PathBuf, process::exit, string::String};
 
-use crate::cli::{Cli, Shell};
+use crate::cli::Cli;
 use crate::structure::{ConfigFile, EnvVariableOption, EnvVariableValue};
+use shells::Shells;
 
 fn main() {
     //! Main function.
@@ -97,7 +99,7 @@ fn main() {
         }
     };
 
-    let shell: Shell = cli_options.shell;
+    let shell: Shells = cli_options.shell;
 
     // Deprecation warning
     if file_data.shell.is_some() {
@@ -116,7 +118,7 @@ fn main() {
     deprecated_to_specific_shell_source(&file_data, &shell);
 }
 
-fn deprecated_to_specific_shell_source(file_data: &ConfigFile, shell: &Shell) {
+fn deprecated_to_specific_shell_source(file_data: &ConfigFile, shell: &Shells) {
     // Output the any specific variables for the shell the same way, if they exist.
     // This behavior is deprecated.
     if let Some(specific_vars) = get_specific_shell(shell, file_data) {
@@ -201,7 +203,7 @@ fn exit_with_file_error(kind: ErrorKind, file_name: &str, file_option_set: bool)
 
 // Deprecated
 fn get_specific_shell<'a>(
-    shell: &Shell,
+    shell: &Shells,
     file_data: &'a ConfigFile,
 ) -> Option<&'a IndexMap<String, EnvVariableValue>> {
     //! Gets the specific environment variables IndexMap for a specific shell.
